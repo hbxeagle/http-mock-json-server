@@ -1,5 +1,5 @@
 {
-  "host":"http://mock.hbx.name/",
+  "host":"http://api.example.com/",
   "ip":"",
   "port":"",
   "mock":[{

@@ -42,7 +42,7 @@ const mockData = function (request, response, config, callback) {
     tpl = `${process.cwd()}/${pathname}.mock`;
   }
 
-  mock = eval(`${loadMockTpl(tpl)}`);
+  mock = eval(`mock = ${loadMockTpl(tpl)}`);
 
   if(mock){
     try{

@@ -1,4 +1,4 @@
-module.exports = {
+{
   "string|1-10": "★",
   "string|3": "★★★",
   "number1|+1": 202,
