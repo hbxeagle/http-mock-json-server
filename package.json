@@ -1,0 +1,62 @@
+{
+  "name": "http-mock-json-server",
+  "version": "0.1.0",
+  "description": "Create the HTTP server is used to generate mock json using mockjs",
+  "main": "dist/mock.js",
+  "bin": {
+    "http-mock": "bin/http-mock"
+  },
+  "engines": {
+    "node": ">= 4.1.0"
+  },
+  "scripts": {
+    "preinstall": "brew install pkg-config cairo libpng jpeg giflib",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublish": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hbxeagle/http-mockjs-server.git"
+  },
+  "keywords": [
+    "mock",
+    "fake",
+    "mockJSON",
+    "mockjs",
+    "http",
+    "server",
+    "node",
+    "json",
+    "api"
+  ],
+  "author": "hbxeagle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hbxeagle/http-mockjs-server/issues"
+  },
+  "homepage": "https://github.com/hbxeagle/http-mockjs-server#readme",
+  "dependencies": {
+    "async": "^2.0.0-rc.5",
+    "canvas": "^1.4.0",
+    "chalk": "^0.5.1",
+    "commander": "^2.9.0",
+    "deep-assign": "^2.0.0",
+    "mime": "^1.3.4",
+    "minimatch": "^0.2.14",
+    "replace-ext": "0.0.1",
+    "text-table": "^0.2.0"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.1.18",
+    "del": "^2.1.0",
+    "gulp": "^3.6.0",
+    "gulp-babel": "^6.1.0",
+    "gulp-if": "^2.0.0",
+    "gulp-ignore": "^2.0.1",
+    "gulp-load-plugins": "^0.7.0",
+    "gulp-order": "^1.1.1",
+    "gulp-plumber": "^1.0.1",
+    "gulp-util": "^3.0.1",
+    "nodegit": "^0.1.4"
+  }
+}

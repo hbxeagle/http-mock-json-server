@@ -1,0 +1,13 @@
+{
+  "host":"http://mock.hbx.name/",
+  "ip":"",
+  "port":"",
+  "mock":[{
+      "pathname":"/test",
+      "tpl":"/test.mock"
+    }, {
+      "pathname":"/test/deep/path",
+      "tpl":"/test2.mock"
+    }
+  ]
+}

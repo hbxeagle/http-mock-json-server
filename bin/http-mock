@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+process.title = 'http-mock';
+
+require('../dist/mock');

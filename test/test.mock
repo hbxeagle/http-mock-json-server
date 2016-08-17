@@ -1,0 +1,75 @@
+module.exports = {
+  "string|1-10": "★",
+  "string|3": "★★★",
+  "number|+1": 202,
+  "number|1-100": 100,
+  "number|1-100.1-10": 1,
+  "number|123.1-10": 1,
+  "number|123.10": 1.123,
+  "boolean|1": true,
+  "boolean|1-2": true,
+  "object|2": {
+    "310000": "上海市",
+    "320000": "江苏省",
+    "330000": "浙江省",
+    "340000": "安徽省"
+  },
+  "object|2-4": {
+    "110000": "北京市",
+    "120000": "天津市",
+    "130000": "河北省",
+    "140000": "山西省"
+  },
+  "array|1": [
+    "AMD",
+    "CMD",
+    "UMD"
+  ],
+  "array|+1": [
+    "AMD",
+    "CMD",
+    "UMD"
+  ],
+  "array|1-10": [
+    {
+      "name|+1": [
+        "Hello",
+        "Mock.js",
+        "!"
+      ]
+    }
+  ],
+  "array|3": [
+    "Hello",
+    "Mock.js",
+    "!"
+  ],
+  "foo": "Syntax Demo",
+  "name": function() {
+    return this.foo
+  },
+  "regexp1": /[a-z][A-Z][0-9]/,
+  "regexp1": /\w\W\s\S\d\D/,
+  "nested": {
+    "a": {
+      "b": {
+        "c": "Mock.js"
+      }
+    }
+  },
+  "absolutePath": "@/foo @/nested/a/b/c",
+  "relativePath": {
+    "a": {
+      "b": {
+        "c": "@../../../foo @../../../nested/a/b/c"
+      }
+    }
+  },
+  "image":"@dataImage('200x100', 'Hello Mock.js!')",
+  "now":"@now('yyyy-MM-dd HH:mm:ss SS')",
+  "color":"@color()",
+  "paragraph":"@paragraph()",
+  "paragraph2":"@paragraph(2)",
+  "paragraph13":"@paragraph(1,3)",
+  "cparagraph":"@cparagraph()",
+}

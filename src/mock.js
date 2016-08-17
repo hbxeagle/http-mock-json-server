@@ -1,0 +1,1 @@
+import * as main from "./core/load.js"

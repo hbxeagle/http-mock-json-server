@@ -1,0 +1,9 @@
+module.exports = {
+  "string|1-10": "★",
+  "string|3": "★★★",
+  "number1|+1": 202,
+  "number2|1-100": 100,
+  "number3|1-100.1-10": 1,
+  "number4|123.1-10": 1,
+  "number5|123.10": 1.123
+}
