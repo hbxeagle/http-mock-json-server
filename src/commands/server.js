@@ -1,5 +1,6 @@
 import chalk from 'chalk'
 import http from 'http'
+import https from 'https'
 import mime from 'mime'
 import url from 'url'
 import querystring from 'querystring';
@@ -12,10 +13,10 @@ import * as Mock from '../utils/mock.js'
 const rType = /\.(\w+)$/i;
 
 const loadMockTpl = function (tpl) {
-  try{
+  try {
     let mock = fsp.readFileSync(tpl);
     return mock;
-  } catch(e) {
+  } catch (e) {
     return null;
   }
 }
@@ -34,7 +35,7 @@ const mockData = function (request, response, config, callback) {
       }
     });
     mock = loadMockTpl(tpl);
-    if (!mock && config.ip ) {
+    if (!mock && config.ip) {
       proxyToSourceServer(request, response, config, callback);
       return;
     }
@@ -44,18 +45,18 @@ const mockData = function (request, response, config, callback) {
 
   mock = eval(`mock = ${loadMockTpl(tpl)}`);
 
-  if(mock){
-    try{
+  if (mock) {
+    try {
       data = Mock.mock(mock);
       let query = querystring.parse(urlObject.query);
       let jsoncallback = query['callback'] || query['jsoncallback'];
 
-      if(jsoncallback) {
+      if (jsoncallback) {
         callback(`${jsoncallback}(${JSON.stringify(data)})`);
       } else {
         callback(JSON.stringify(data));
       }
-    } catch(e) {
+    } catch (e) {
       callback(null, [e]);
     }
   } else {
@@ -64,6 +65,45 @@ const mockData = function (request, response, config, callback) {
 }
 
 const proxyToSourceServer = function (request, response, config, callback) {
+  //let urlObject = url.parse(request.url);
+  
+  //if(urlObject.protocol == "https") {
+  proxyHttp(request, response, config, callback);
+  // } else if(urlObject.protocol == "http") {
+  //   proxyHttps(request, response, config, callback);
+  // } else {
+  //   callback(null, [new Error(`protocol ${urlObject.protocol} is not supported`)]);
+  // }
+}
+
+// const proxyHttps = function (request, response, config, callback) {
+
+//   let options = {
+//     host: config.ip,
+//     port: config.port || "443",
+//     method: request.method,
+//     path: request.url,
+//     headers: request.headers
+//   };
+
+//   let body = '';
+//   let req = https.request(opt, function (res) {
+//     res.pipe(response);
+//     response.writeHeader(res.statusCode, res.headers);
+
+//     console.log("Got response: " + res.statusCode);
+//     res.on('data', function (d) {
+//       body += d;
+//     }).on('end', function () {
+//       callback(body, null, true);
+//     });
+//   }).on('error', function (e) {
+//     callback(null, [e]);
+//   })
+//   req.end();
+// }
+
+const proxyHttp = function (request, response, config, callback) {
   let opt = {
     host: config.ip,
     port: config.port || "80",
@@ -86,14 +126,19 @@ const proxyToSourceServer = function (request, response, config, callback) {
   }).on('error', function (e) {
     callback(null, [e]);
   })
-  req.end();
+
+  if (/POST|PUT/i.test(request.method)) {
+    request.pipe(req);
+  } else {
+    req.end();
+  }
 }
 
 const output = function (code, data, request, response, pathname) {
   if (data) {
     response.writeHeader(code, {
       'content-type': (pathname.match(rType) ? mime.lookup(pathname) : mime.lookup('json')) + ';charset=utf-8',
-      'Access-Control-Allow-Origin':"*"
+      'Access-Control-Allow-Origin': "*"
     });
     response.end(data);
 
@@ -115,9 +160,9 @@ const onRequest = function (request, response, options, config) {
     }
     if (err) {
       console.error(chalk.bold.white.bgRed(' ERROR '));
-      err.some(function (_err) {
-        console.error(_err);
-      });
+      //err.some(function (_err) {
+        console.error(err);
+      //});
 
       if (fileData) {
         output(502, null, request, response, pathname);
