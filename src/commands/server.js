@@ -5,6 +5,7 @@ import mime from 'mime'
 import url from 'url'
 import querystring from 'querystring';
 import assign from 'deep-assign'
+import sleep from 'thread-sleep';
 
 import * as fsp from '../utils/fs.js'
 import * as path from '../utils/path.js'
@@ -32,6 +33,12 @@ const mockData = function (request, response, config, callback) {
     config.mock.some(function (mock) {
       if (mock.pathname == pathname) {
         tpl = `${process.cwd()}/${mock.tpl}`;
+        if(mock.delay > 0 && !isNaN(mock.delay)) {
+          sleep(parseInt(mock.delay));
+        }
+        if(mock.statusCode &&  mock.statusCode!== 200) {
+          callback(null, mock.statusCode);
+        }
       }
     });
     mock = loadMockTpl(tpl);
@@ -57,51 +64,16 @@ const mockData = function (request, response, config, callback) {
         callback(JSON.stringify(data));
       }
     } catch (e) {
-      callback(null, [e]);
+      callback(null, 502, e);
     }
   } else {
-    callback(null, [new Error('mock tpl not found')]);
+    callback(null, 502, new Error('mock tpl not found'));
   }
 }
 
 const proxyToSourceServer = function (request, response, config, callback) {
-  //let urlObject = url.parse(request.url);
-  
-  //if(urlObject.protocol == "https") {
   proxyHttp(request, response, config, callback);
-  // } else if(urlObject.protocol == "http") {
-  //   proxyHttps(request, response, config, callback);
-  // } else {
-  //   callback(null, [new Error(`protocol ${urlObject.protocol} is not supported`)]);
-  // }
 }
-
-// const proxyHttps = function (request, response, config, callback) {
-
-//   let options = {
-//     host: config.ip,
-//     port: config.port || "443",
-//     method: request.method,
-//     path: request.url,
-//     headers: request.headers
-//   };
-
-//   let body = '';
-//   let req = https.request(opt, function (res) {
-//     res.pipe(response);
-//     response.writeHeader(res.statusCode, res.headers);
-
-//     console.log("Got response: " + res.statusCode);
-//     res.on('data', function (d) {
-//       body += d;
-//     }).on('end', function () {
-//       callback(body, null, true);
-//     });
-//   }).on('error', function (e) {
-//     callback(null, [e]);
-//   })
-//   req.end();
-// }
 
 const proxyHttp = function (request, response, config, callback) {
   let opt = {
@@ -121,10 +93,10 @@ const proxyHttp = function (request, response, config, callback) {
     res.on('data', function (d) {
       body += d;
     }).on('end', function () {
-      callback(body, null, true);
+      callback(body, res.statusCode, null, true);
     });
   }).on('error', function (e) {
-    callback(null, [e]);
+    callback(null, 502, e);
   })
 
   if (/POST|PUT/i.test(request.method)) {
@@ -143,7 +115,9 @@ const output = function (code, data, request, response, pathname) {
     response.end(data);
 
   } else {
-    response.writeHeader(code);
+    response.writeHeader(code,{
+      'Access-Control-Allow-Origin': "*"
+    });
     response.end();
   }
 };
@@ -154,7 +128,7 @@ const onRequest = function (request, response, options, config) {
   let host = request.headers.host;
 
   console.log(chalk.bold.green('GET:') + ' http://' + host + pathname);
-  mockData(request, response, config, function (fileData, err, isProxy) {
+  mockData(request, response, config, function (fileData, statusCode, err, isProxy) {
     if (isProxy) {
       response.end(fileData);
     }
@@ -171,7 +145,7 @@ const onRequest = function (request, response, options, config) {
       }
 
     } else {
-      output(200, fileData, request, response, pathname);
+      output(statusCode || 200, fileData, request, response, pathname);
     }
   });
 }
@@ -191,12 +165,16 @@ const startServer = function (options, config) {
   });
 
   server.on('request', function (request, response) {
+    let dirname = process.cwd();
+
+    let config = fsp.readJSONSync(path.join(dirname, 'mock.json'));
+
     onRequest(request, response, options, config);
   });
 
   server.listen(options.port);
 }
 
-export default function (options, config) {
-  startServer(options, config);
+export default function (options) {
+  startServer(options);
 }

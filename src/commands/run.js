@@ -27,9 +27,6 @@ export default function (options) {
   console.log('正在启动 http-mockjs 模拟数据服务器...');
 
   options.port = options.port || 7071;
-  let dirname = process.cwd();
 
-  let config = fsp.readJSONSync(path.join(dirname, 'mock.json'));
-
-  server(options, config);
+  server(options);
 }

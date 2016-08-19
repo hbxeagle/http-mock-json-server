@@ -1,36 +1,36 @@
 {
-  "string|1-10": "★",
-  "string|3": "★★★",
-  "number|+1": 202,
-  "number|1-100": 100,
-  "number|1-100.1-10": 1,
-  "number|123.1-10": 1,
-  "number|123.10": 1.123,
-  "boolean|1": true,
-  "boolean|1-2": true,
-  "object|2": {
+  "string1|1": "★",
+  "string2|3": "★★★",
+  "number1|+1": 202,
+  "number2|1-100": 100,
+  "number3|1-100.1-10": 1,
+  "number4|123.1-10": 1,
+  "number5|123.10": 1.123,
+  "boolean1|1": true,
+  "boolean2|1-2": true,
+  "object1|2": {
     "310000": "上海市",
     "320000": "江苏省",
     "330000": "浙江省",
     "340000": "安徽省"
   },
-  "object|2-4": {
+  "object2|2-4": {
     "110000": "北京市",
     "120000": "天津市",
     "130000": "河北省",
     "140000": "山西省"
   },
-  "array|1": [
+  "array1|1": [
     "AMD",
     "CMD",
     "UMD"
   ],
-  "array|+1": [
+  "array2|+1": [
     "AMD",
     "CMD",
     "UMD"
   ],
-  "array|1-10": [
+  "array3|1-10": [
     {
       "name|+1": [
         "Hello",
@@ -39,7 +39,7 @@
       ]
     }
   ],
-  "array|3": [
+  "array4|3": [
     "Hello",
     "Mock.js",
     "!"
@@ -49,7 +49,7 @@
     return this.foo
   },
   "regexp1": /[a-z][A-Z][0-9]/,
-  "regexp1": /\w\W\s\S\d\D/,
+  "regexp2": /\w\W\s\S\d\D/,
   "nested": {
     "a": {
       "b": {

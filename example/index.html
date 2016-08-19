@@ -17,11 +17,6 @@
     .key {color: red;}
   </style>
   <script>
-    function output(obj,inp) {
-      var pre = $("<pre>").html(inp);
-      obj.append(pre);
-    }
-
     function syntaxHighlight(json) {
       json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
       return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
@@ -46,12 +41,34 @@
       });
     }
 
+    function writeReturn(obj, data) {
+      console.log(data);
+      $(obj).parent().find(".return").html(syntaxHighlight(JSON.stringify(data, null, 4)));
+    }
+
+    function writeStatusCode(obj, code) {
+      console.log(code);
+      $(obj).parent().find("b").html(code);
+    }
+
+    function writeDelay(obj, delay) {
+      console.log(delay);
+      $(obj).parent().find("i").html(delay);
+    }
+    var start;
+    $.ajaxSetup({
+      beforeSend: function(){
+        start = (new Date()).getTime();
+      }
+    });
+
     function getJSON(url,obj){
-      $.getJSON(url)
-        .done(function(data){
-          console.log(data);
-          output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-        });
+      $.getJSON(url).done(function(data){
+        writeReturn(obj, data);
+      }).always(function(code){
+        writeStatusCode(obj, arguments[2].status || arguments[0].status);
+        writeDelay(obj, (new Date()).getTime() - start);
+      });
     }
 
     function jsonp(url,obj){
@@ -59,9 +76,11 @@
         url:url,
         dataType:'jsonp'
       }).done(function(data){
-          console.log(data);
-          output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-        });
+        writeReturn(obj, data);
+      }).always(function(code){
+        writeStatusCode(obj, arguments[2].status || arguments[0].status);
+        writeDelay(obj, (new Date()).getTime() - start);
+      });
     }
 
     function getProxy(obj){
@@ -74,9 +93,11 @@
         },
         dataType:'json'
       }).done(function(data){
-          console.log(data);
-          output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-        });
+        writeReturn(obj, data);
+      }).always(function(code){
+        writeStatusCode(obj, arguments[2].status || arguments[0].status);
+        writeDelay(obj, (new Date()).getTime() - start);
+      });
     }
 
     function postProxy(obj){
@@ -89,9 +110,11 @@
         },
         dataType:'json'
       }).done(function(data){
-          console.log(data);
-          output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-        });
+        writeReturn(obj, data);
+      }).always(function(code){
+        writeStatusCode(obj, arguments[2].status || arguments[0].status);
+        writeDelay(obj, (new Date()).getTime() - start);
+      });
     }
 
   </script>
@@ -103,66 +126,68 @@
   </div>
   <div class="container">
     <h4>1. mock http://api.example.com/test</h4>
-    <div>
-      <input class="btn btn-default" onclick="getJSON('http://api.example.com/test',this)" type="button" value="click me">
-    </div>
+    <div>status code:<b>&nbsp;</b><br>delay:<i>&nbsp;</i>ms</div>
+    <pre>
+
+  $.getJSON('http://api.example.com/test')
+    </pre>
+    <input class="btn btn-default" onclick="getJSON('http://api.example.com/test',this)" type="button" value="click me">
+    <pre class="return">return json</pre>
   </div>
   <div class="container">
     <h4>2. mock http://api.example.com/test/deep/path</h4>
-    <div>
-      <input class="btn btn-default" onclick="getJSON('http://api.example.com/test/deep/path',this)" type="button" value="click me">
-    </div>
+    <div>status code:<b>&nbsp;</b><br>delay:<i>&nbsp;</i>ms</div>
+    <pre>
+
+  $.getJSON('http://api.example.com/test/deep/path')
+    </pre>
+    <input class="btn btn-default" onclick="getJSON('http://api.example.com/test/deep/path',this)" type="button" value="click me">
+    <pre class="return">return json</pre>
   </div>
   <div class="container">
     <h4>3. mock jsonp</h4>
+    <div>status code:<b>&nbsp;</b><br>delay:<i>&nbsp;</i>ms</div>
     <pre>
-  function jsonp(url,obj){
-    $.ajax({
-      url:url,
-      dataType:'jsonp'
-    }).done(function(data){
-      console.log(data);
-      output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-    });
-  }
+
+  $.ajax({
+    url:'http://api.example.com/test/deep/path',
+    dataType:'jsonp'
+  })
     </pre>
     <input class="btn btn-default" onclick="jsonp('http://api.example.com/test/deep/path',this)" type="button" value="click me">
+    <pre class="return">return json</pre>
   </div>
   <div class="container">
     <h4>4. https get proxy</h4>
+    <div>status code:<b>&nbsp;</b><br>delay:<i>&nbsp;</i>ms</div>
     <pre>
-  function getProxy(obj){
-    $.ajax({
-      url:'https://api.github.com/',
-      method: "GET",
-      dataType:'json'
-    }).done(function(data){
-      console.log(data);
-      output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-    });
-  }
+
+  $.ajax({
+    url:'https://api.github.com/',
+    method: "GET",
+    dataType:'json'
+  })
     </pre>
     <input class="btn btn-default" onclick="getProxy(this)" type="button" value="click me">
+    <pre class="return">return json</pre>
   </div>
   <div class="container">
     <h4>5. post proxy</h4>
+    <div>status code:<b>&nbsp;</b><br>delay:<i>&nbsp;</i>ms</div>
     <pre>
-  function getProxy(obj){
-    $.ajax({
-      url:'http://api.example.com/post/proxy',
-      method: "POST",
-      data: {
-        name: 'eagle',
-        password: 'xxxxxxx'
-      },
-      dataType:'json'
-    }).done(function(data){
-      console.log(data);
-      output($(obj).parent(),syntaxHighlight(JSON.stringify(data, null, 4)));
-    });
+      
+  $.ajax({
+    url:'http://api.example.com/post/proxy',
+    method: "POST",
+    data: {
+      name: 'eagle',
+      password: 'xxxxxxx'
+    },
+    dataType:'json'
   }
     </pre>
     <input class="btn btn-default" onclick="postProxy(this)" type="button" value="click me">
+    <pre class="return">return json</pre>
   </div>
 
 </body>

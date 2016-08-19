@@ -4,13 +4,13 @@
 ***json数据接口模拟服务***
 
 ##
->使用node搭建了一个模拟服务端api的服务，根据mockJSON的规则，生成随机数据。生成随机数据的核心是[Mockjs](http://mockjs.com)，但是其调用方式为在页面中引入mock.js的方式拦截Ajax，不太符合本人的需求，所以做了node server封装，同时加入proxy功能，可以只拦截部分配置的接口，未配置的接口可以根据配置转发给源服务器。具体mockJSON的规则可以参考[Mockjs](http://mockjs.com)中的文档。
+>使用node搭建了一个模拟服务端api的服务，根据mockJSON的规则，生成随机数据，同时可以通过修改配置文件`mock.json`动态配置返回数据，请求状态（502，404等），以及请求延时。。生成随机数据的核心是[Mockjs](http://mockjs.com)，但是其调用方式为在页面中引入mock.js的方式拦截Ajax，不太符合本人的需求，所以做了node server封装，同时加入proxy功能，可以只拦截部分配置的接口，未配置的接口可以根据配置转发给源服务器。具体mockJSON的规则可以参考[Mockjs](http://mockjs.com)中的文档。
 
 
 ### 安装环境 Requirements
 
 * node 4.1.0+
-* node-canvas 此模块安装比较复杂，需要先单独安装
+* node-canvas win系统此模块安装比较复杂，需要先单独安装。
 
 ### 安装/更新 Install/Update
 
@@ -37,7 +37,9 @@
   "port":"",
   "mock":[{
     "pathname":"/test",
-    "tpl":"test.mock"
+    "tpl":"test.mock",
+    "statusCode": 200,
+    "delay": 5000
   },{
     "pathname":"/test/deep/path",
     "tpl":"test2.mock"
@@ -53,6 +55,8 @@ port：需要代理的域名的端口，非必填
 mock：请求路径和模板的匹配关系。
   pathname：请求路径
   tpl：mockJSON模板文件
+  statusCode：http请求返回码，默认如果模板正常则是200。
+  delay：http请求延时
 ```
 
 ##### test.mock

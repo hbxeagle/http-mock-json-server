@@ -1,6 +1,6 @@
 {
   "name": "http-mock-json-server",
-  "version": "0.1.0-beta2",
+  "version": "0.1.0",
   "description": "Create the HTTP server is used to generate mock json using mockjs",
   "main": "dist/mock.js",
   "bin": {
@@ -41,11 +41,11 @@
     "chalk": "^0.5.1",
     "commander": "^2.9.0",
     "deep-assign": "^2.0.0",
-    "http-proxy": "^1.14.0",
     "mime": "^1.3.4",
     "minimatch": "^0.2.14",
     "replace-ext": "0.0.1",
-    "text-table": "^0.2.0"
+    "text-table": "^0.2.0",
+    "thread-sleep": "^1.0.4"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.1.18",

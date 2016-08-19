@@ -4,7 +4,9 @@
   "port":"",
   "mock":[{
       "pathname":"/test",
-      "tpl":"/test.mock"
+      "tpl":"/test.mock",
+      "statusCode": 500,
+      "delay": 5000
     }, {
       "pathname":"/test/deep/path",
       "tpl":"/test2.mock"
