@@ -22,41 +22,42 @@ const loadMockTpl = function (tpl) {
   }
 }
 
-const mockData = function (request, response, config, callback) {
+/**
+ * 将mock中的@GET['id'],@POST['pwd'],@REST['user']替换为对应的请求参数。
+ */
+const AnalyserRequestPlaceholder = function(mockTpl, reqArg) {
+  if(!mockTpl) {
+    return null;
+  }
+  mockTpl = mockTpl.replace(/\\*@(GET|POST|REST)(?:\[(.*?)\])?/g,function(s){
+    s = s.replace(/^@/,'.');
+    return eval(`reqArg${s}||''`);
+  });
+  return mockTpl;
+}
+
+const _mockData = function(tplPath, request, response, body, config, options, callback) {
+
+  let mockTpl = loadMockTpl(tplPath);
 
   let urlObject = url.parse(request.url);
-  let pathname = urlObject.pathname;
+  let GET = querystring.parse(urlObject.query);
+  let POST = querystring.parse(body);
+  let REST = {};
 
-  let data, tpl, mock;
-
-  if (config) {
-    config.mock.some(function (mock) {
-      if (mock.pathname == pathname) {
-        tpl = `${process.cwd()}/${mock.tpl}`;
-        if(mock.delay > 0 && !isNaN(mock.delay)) {
-          sleep(parseInt(mock.delay));
-        }
-        if(mock.statusCode &&  mock.statusCode!== 200) {
-          callback(null, mock.statusCode);
-        }
-      }
-    });
-    mock = loadMockTpl(tpl);
-    if (!mock && config.ip) {
-      proxyToSourceServer(request, response, config, callback);
-      return;
-    }
-  } else {
-    tpl = `${process.cwd()}/${pathname}.mock`;
+  if(options.log) {
+    GET && console.log("GET：",GET);
+    POST && console.log("POST：",POST);
   }
 
-  mock = eval(`mock = ${loadMockTpl(tpl)}`);
+  mockTpl = AnalyserRequestPlaceholder(mockTpl,{GET, POST, REST});
+
+  let data, mock = eval(`mock = ${mockTpl}`);
 
   if (mock) {
     try {
       data = Mock.mock(mock);
-      let query = querystring.parse(urlObject.query);
-      let jsoncallback = query['callback'] || query['jsoncallback'];
+      let jsoncallback = GET['callback'] || GET['jsoncallback'];
 
       if (jsoncallback) {
         callback(`${jsoncallback}(${JSON.stringify(data)})`);
@@ -71,11 +72,52 @@ const mockData = function (request, response, config, callback) {
   }
 }
 
-const proxyToSourceServer = function (request, response, config, callback) {
-  proxyHttp(request, response, config, callback);
+const mockData = function (request, response, config, options, callback) {
+
+  let urlObject = url.parse(request.url);
+  let pathname = path.join(urlObject.pathname); // 去掉多余的 / 如：http://api.example.com//test/deep//path
+  let headers = request.headers;
+  let host = headers.host;
+
+  let tplPath;
+
+  if (config) {
+
+    config.mock.some(function (mock) {
+      if (mock.pathname == pathname) {
+        tplPath = path.join(process.cwd(), mock.tpl);
+        if(mock.delay > 0 && !isNaN(mock.delay)) {
+          sleep(parseInt(mock.delay));
+        }
+        if(mock.statusCode &&  mock.statusCode!== 200) {
+          callback(null, mock.statusCode);
+        }
+      }
+    });
+
+    if (!tplPath && config.ip) {
+      proxyToSourceServer(request, response, config, options, callback);
+      return;
+    }
+
+  } else {
+    tplPath = path.join(process.cwd(), `${pathname}.mock`);
+  }
+
+  let body = [];
+  request.on('data', function(chunk) {
+    body.push(chunk);
+  }).on('end', function() {
+    body = Buffer.concat(body).toString();
+    _mockData(tplPath, request, response, body, config, options, callback);
+  });
 }
 
-const proxyHttp = function (request, response, config, callback) {
+const proxyToSourceServer = function (request, response, config, options, callback) {
+  proxyHttp(request, response, config, options, callback);
+}
+
+const proxyHttp = function (request, response, config, options, callback) {
   let opt = {
     host: config.ip,
     port: config.port || "80",
@@ -83,21 +125,39 @@ const proxyHttp = function (request, response, config, callback) {
     path: request.url,
     headers: request.headers
   }
+
+  let body = [];
+  request.on('data', function(chunk) {
+    body.push(chunk);
+  }).on('end', function() {
+    body = Buffer.concat(body).toString();
+    if(options.log) {
+      let urlObject = url.parse(request.url);
+      let GET = querystring.parse(urlObject.query);
+      let POST = querystring.parse(body);
+
+      GET && console.log("GET：",GET);
+      POST && console.log("POST：",POST);
+    }
+  });
+
+  console.log(chalk.green(`Proxy to ${opt.host}:${opt.port}`));
+
   //以下是接受数据的代码
-  let body = '';
+  let resBody = '';
   let req = http.request(opt, function (res) {
     res.pipe(response);
     response.writeHeader(res.statusCode, res.headers);
 
     console.log("Got response: " + res.statusCode);
     res.on('data', function (d) {
-      body += d;
+      resBody += d;
     }).on('end', function () {
-      callback(body, res.statusCode, null, true);
+      callback(resBody, res.statusCode, null, true);
     });
   }).on('error', function (e) {
     callback(null, 502, e);
-  })
+  });
 
   if (/POST|PUT/i.test(request.method)) {
     request.pipe(req);
@@ -127,8 +187,11 @@ const onRequest = function (request, response, options, config) {
   let pathname = url.parse(request.url).pathname;
   let host = request.headers.host;
 
-  console.log(chalk.bold.green('GET:') + ' http://' + host + pathname);
-  mockData(request, response, config, function (fileData, statusCode, err, isProxy) {
+  // console.log(request._secure, request.connection.encrypted);
+
+  console.log(chalk.bold.green('REQ:') + ' http://' + host + pathname);
+
+  mockData(request, response, config, options, function (fileData, statusCode, err, isProxy) {
     if (isProxy) {
       response.end(fileData);
     }
@@ -161,13 +224,15 @@ const startServer = function (options, config) {
     } else {
       console.log('启动成功，监听端口： %s', options.port);
     }
-
   });
 
   server.on('request', function (request, response) {
     let dirname = process.cwd();
-
-    let config = fsp.readJSONSync(path.join(dirname, 'mock.json'));
+    let configFile = 'mock.json';
+    if(options.config) {
+      configFile = options.config;
+    }
+    let config = fsp.readJSONSync(path.join(dirname, configFile));
 
     onRequest(request, response, options, config);
   });

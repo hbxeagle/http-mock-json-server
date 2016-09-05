@@ -1,6 +1,6 @@
 {
   "host":"http://api.example.com/",
-  "ip":"",
+  "ip":"100.100.100.100",
   "port":"",
   "mock":[{
       "pathname":"/test",

@@ -1,6 +1,6 @@
 {
   "name": "http-mock-json-server",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Create the HTTP server is used to generate mock json using mockjs",
   "main": "dist/mock.js",
   "bin": {
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hbxeagle/http-mockjs-server.git"
+    "url": "git+https://github.com/hbxeagle/http-mock-json-server.git"
   },
   "keywords": [
     "mock",
@@ -32,9 +32,9 @@
   "author": "hbxeagle",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/hbxeagle/http-mockjs-server/issues"
+    "url": "https://github.com/hbxeagle/http-mock-json-server/issues"
   },
-  "homepage": "https://github.com/hbxeagle/http-mockjs-server#readme",
+  "homepage": "https://github.com/hbxeagle/http-mock-json-server#readme",
   "dependencies": {
     "async": "^2.0.0-rc.5",
     "canvas": "^1.4.0",

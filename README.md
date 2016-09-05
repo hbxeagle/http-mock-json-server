@@ -20,6 +20,19 @@
 
 `http-mock`
 
+#### -p --prot 设置模拟数据服务的监听端口
+>注意修改nginx的对应proxy的端口
+
+`http-mock --prot=7072`
+
+#### -c --config 设置mock配置文件
+
+`http-mock --config="mock.proxy.json"`
+
+#### --log 显示GET、POST请求参数
+
+`http-mock --log`
+
 #####运行目录：
 
 `mock模板文件目录，mock.json所在目录。`
@@ -66,6 +79,21 @@ mock：请求路径和模板的匹配关系。
   "string|1-10": "★",
   "string|3": "★★★",
   "number1|+1": 202,
+  "number2|1-100": 100,
+  "number3|1-100.1-10": 1,
+  "number4|123.1-10": 1,
+  "number5|123.10": 1.123
+}
+```
+
+##### 在mockjs的基础上扩展对GET、POST请求参数的支持
+>1、不支持多媒体类型上传数据；2、使用方括号包含参数名，如：GET['id']；3、如果为key，必须使用双引号将请括起来如："get": "GET['id']"
+
+```
+{
+  "get": "GET['id']",
+  "post|3": "POST['user']",
+  "number1|+GET['idstep']": 202,
   "number2|1-100": 100,
   "number3|1-100.1-10": 1,
   "number4|123.1-10": 1,
