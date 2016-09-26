@@ -1,6 +1,6 @@
 {
   "name": "http-mock-json-server",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Create the HTTP server is used to generate mock json using mockjs",
   "main": "dist/mock.js",
   "bin": {

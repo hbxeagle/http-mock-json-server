@@ -27,6 +27,7 @@
 
 #### -c --config 设置mock配置文件
 
+`http-mock -c "mock.proxy.json"`
 `http-mock --config="mock.proxy.json"`
 
 #### --log 显示GET、POST请求参数

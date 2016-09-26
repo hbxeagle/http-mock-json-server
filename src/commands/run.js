@@ -24,7 +24,7 @@ global.timer = setInterval(function () {
 }, 50);
 
 export default function (options) {
-  console.log('正在启动 http-mockjs 模拟数据服务器...');
+  console.log('正在启动 http-mock-json-sever 模拟数据服务器...');
 
   options.port = options.port || 7071;
 

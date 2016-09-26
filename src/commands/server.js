@@ -52,23 +52,23 @@ const _mockData = function(tplPath, request, response, body, config, options, ca
 
   mockTpl = AnalyserRequestPlaceholder(mockTpl,{GET, POST, REST});
 
-  let data, mock = eval(`mock = ${mockTpl}`);
+  try {
+    let data, mock = eval(`mock = ${mockTpl}`);
+    if (mock) {
+      
+        data = Mock.mock(mock);
+        let jsoncallback = GET['callback'] || GET['jsoncallback'];
 
-  if (mock) {
-    try {
-      data = Mock.mock(mock);
-      let jsoncallback = GET['callback'] || GET['jsoncallback'];
-
-      if (jsoncallback) {
-        callback(`${jsoncallback}(${JSON.stringify(data)})`);
-      } else {
-        callback(JSON.stringify(data));
-      }
-    } catch (e) {
-      callback(null, 502, e);
+        if (jsoncallback) {
+          callback(`${jsoncallback}(${JSON.stringify(data)})`);
+        } else {
+          callback(JSON.stringify(data));
+        }
+    } else {
+      callback(null, 502, new Error('mock tpl not found'));
     }
-  } else {
-    callback(null, 502, new Error('mock tpl not found'));
+  } catch (e) {
+    callback(null, 502, e);
   }
 }
 
