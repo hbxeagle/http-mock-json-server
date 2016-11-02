@@ -10,16 +10,18 @@
 ### 安装环境 Requirements
 * node 4.1.0+
 
-####Mac
+#### Mac
 1. 安装 brew
 2. brew install pkg-config cairo libpng jpeg giflib
 
-####Windows
-1. 安装 Microsoft Visual C++ 2010 or later 下载安装免费的 Visual Studio Community 或 Express 即可。`安装的时候注意勾选 C++ 支持`
-2. 安装 Python 2.7 for Windows
+#### Windows
+1. 安装 Microsoft Visual C++ 2010 or later 下载安装免费的 Visual Studio [Community](https://go.microsoft.com/fwlink/?LinkId=532606&clcid=0x409) 或 [Express](https://go.microsoft.com/fwlink/?LinkId=615464&clcid=0x409) 即可。`安装的时候注意勾选 C++ 支持`
+2. 安装 [Python 2.7.x for Windows](http://www.python.org/getit)
 3. 安装 `npm install -g node-gyp`
-4. 下载 GTK 2，解压到 c:/GTK
-5. 安装 libjpeg-turbo SDK for Visual C++ 默认安装
+4. 下载 GTK 2 [Win32](http://ftp.gnome.org/pub/GNOME/binaries/win32/gtk+/2.24/gtk+-bundle_2.24.10-20120208_win32.zip) 或 [Win64](http://ftp.gnome.org/pub/GNOME/binaries/win64/gtk+/2.22/gtk+-bundle_2.22.1-20101229_win64.zip)，解压到 c:/GTK
+5. 安装 [libjpeg-turbo SDK for Visual C++](http://sourceforge.net/projects/libjpeg-turbo/) 默认安装
+
+> 参考 https://github.com/Automattic/node-canvas/wiki/Installation---Windows
 
 ### 安装/更新 Install/Update
 
@@ -43,15 +45,15 @@
 
 `http-mock --log`
 
-#####运行目录：
+##### 运行目录：
 
 `mock模板文件目录，mock.json所在目录。`
 
-#####功能简介：
+##### 功能简介：
 
 `根据mock.json文件中的配置，匹配请求路径和mock模板文件直接的关系。如果不配置此文件，则安装请求路径加 .mock 后缀的方式查找mock模板文件。`
 
-#####mock.json：
+##### mock.json：
 
 ```json
 {
