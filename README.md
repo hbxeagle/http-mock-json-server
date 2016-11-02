@@ -8,9 +8,18 @@
 
 
 ### 安装环境 Requirements
-
 * node 4.1.0+
-* node-canvas win系统此模块安装比较复杂，需要先单独安装。
+
+####Mac
+1. 安装 brew
+2. brew install pkg-config cairo libpng jpeg giflib
+
+####Windows
+1. 安装 Microsoft Visual C++ 2010 or later 下载安装免费的 Visual Studio Community 或 Express 即可。`安装的时候注意勾选 C++ 支持`
+2. 安装 Python 2.7 for Windows
+3. 安装 `npm install -g node-gyp`
+4. 下载 GTK 2，解压到 c:/GTK
+5. 安装 libjpeg-turbo SDK for Visual C++ 默认安装
 
 ### 安装/更新 Install/Update
 
