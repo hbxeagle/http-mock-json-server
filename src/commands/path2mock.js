@@ -31,7 +31,7 @@ export default function (request, body, mocks) {
       let _match = mock.pathname;
       if (rest) {
         rest.some(function(v){
-          _match = _match.replace(v, '(.*)');
+          _match = _match.replace(v, '([^/]*)');
         });
         let _rest = pathname.match(new RegExp(_match));
         if(_rest) {
