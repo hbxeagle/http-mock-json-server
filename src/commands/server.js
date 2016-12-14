@@ -10,6 +10,7 @@ import sleep from 'thread-sleep';
 import * as fsp from '../utils/fs.js'
 import * as path from '../utils/path.js'
 import * as Mock from '../utils/mock.js'
+import path2mock from './path2mock.js'
 
 const rType = /\.(\w+)$/i;
 
@@ -36,18 +37,16 @@ const AnalyserRequestPlaceholder = function(mockTpl, reqArg) {
   return mockTpl;
 }
 
-const _mockData = function(tplPath, request, response, body, config, options, callback) {
+const _mockData = function(tplPath, mock, options, callback) {
 
   let mockTpl = loadMockTpl(tplPath);
 
-  let urlObject = url.parse(request.url);
-  let GET = querystring.parse(urlObject.query);
-  let POST = querystring.parse(body);
-  let REST = {};
+  let {GET, POST, REST} = mock;
 
   if(options.log) {
     GET && console.log("GET：",GET);
     POST && console.log("POST：",POST);
+    REST && console.log("POST：",REST);
   }
 
   mockTpl = AnalyserRequestPlaceholder(mockTpl,{GET, POST, REST});
@@ -55,7 +54,6 @@ const _mockData = function(tplPath, request, response, body, config, options, ca
   try {
     let data, mock = eval(`mock = ${mockTpl}`);
     if (mock) {
-      
         data = Mock.mock(mock);
         let jsoncallback = GET['callback'] || GET['jsoncallback'];
 
@@ -74,17 +72,17 @@ const _mockData = function(tplPath, request, response, body, config, options, ca
 
 const mockData = function (request, response, config, options, callback) {
 
-  let urlObject = url.parse(request.url);
-  let pathname = path.join(urlObject.pathname); // 去掉多余的 / 如：http://api.example.com//test/deep//path
-  let headers = request.headers;
-  let host = headers.host;
+  let body = [];
+  request.on('data', function(chunk) {
+    body.push(chunk);
+  }).on('end', function() {
+    body = Buffer.concat(body).toString();
 
-  let tplPath;
+    let tplPath;
+    let mock = path2mock(request, body, config ? config.mock : []);
 
-  if (config) {
-
-    config.mock.some(function (mock) {
-      if (mock.pathname == pathname) {
+    if (config) {
+      if(mock.tpl) {
         tplPath = path.join(process.cwd(), mock.tpl);
         if(mock.delay > 0 && !isNaN(mock.delay)) {
           sleep(parseInt(mock.delay));
@@ -93,23 +91,17 @@ const mockData = function (request, response, config, options, callback) {
           callback(null, mock.statusCode);
         }
       }
-    });
 
-    if (!tplPath && config.ip) {
-      proxyToSourceServer(request, response, config, options, callback);
-      return;
+      if (!tplPath && config.ip) {
+        proxyToSourceServer(request, response, config, options, callback);
+        return;
+      }
+
+    } else {
+      tplPath = path.join(process.cwd(), `${pathname}.mock`);
     }
 
-  } else {
-    tplPath = path.join(process.cwd(), `${pathname}.mock`);
-  }
-
-  let body = [];
-  request.on('data', function(chunk) {
-    body.push(chunk);
-  }).on('end', function() {
-    body = Buffer.concat(body).toString();
-    _mockData(tplPath, request, response, body, config, options, callback);
+    _mockData(tplPath, mock, options, callback);
   });
 }
 
