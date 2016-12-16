@@ -37,10 +37,17 @@ export default function (request, body, mocks) {
         if(_rest) {
           _rest.shift();
           if(_rest) {
-            _mock = mock;
             rest.some(function(v,i){
               REST[v.replace(/[\{|\}]/g, "")] = _rest[i];
             });
+            if (mock.apiKey) {
+              let apiKey = mock.apiKey.split('=');
+              if (REST[apiKey[0]] == apiKey[1]) {
+                _mock = mock;
+              }
+            } else {
+              _mock = mock;
+            }
           }
         }
       }

@@ -65,12 +65,31 @@
     "tpl":"test.mock",
     "statusCode": 200,
     "delay": 5000
-  },{
+  }, {
     "pathname":"/test/deep/path",
     "tpl":"test2.mock"
+  }, {
+    "pathname":"/rest/path/{arg1}/{arg2}-{arg3}",
+    "tpl":"rest.mock"
+  }, {
+    "pathname":"/rest/{method}/{arg1}/{arg2}-{arg3}",
+    "apiKey":"method=list",
+    "tpl":"rest.list.mock"
+  }, {
+    "pathname":"/rest",
+    "apiKey":"method=list",
+    "tpl":"rest.method.list.mock"
   }]
 }
 ```
+
+##### 支持REST风格
+
+使用`{参数名}`的方式如：/rest/{method}/{arg1}/{arg2}-{arg3}
+
+##### 支持使用请求参数（GET、POST、REST）区分不同的接口
+
+`"apiKey":"参数名=参数值"`如："apiKey":"method=list"
 
 ##### 参数说明：
 ```
@@ -79,6 +98,7 @@ ip：需要代理的域名的ip，非必填，如果不填，相当于放弃prox
 port：需要代理的域名的端口，非必填
 mock：请求路径和模板的匹配关系。
   pathname：请求路径
+  apiKey: 请求参数（或rest中的参数）作为 key ，区分接口。使用等号分隔：参数名=参数值
   tpl：mockJSON模板文件
   statusCode：http请求返回码，默认如果模板正常则是200。
   delay：http请求延时
@@ -98,18 +118,142 @@ mock：请求路径和模板的匹配关系。
 }
 ```
 
-##### 在mockjs的基础上扩展对GET、POST请求参数的支持
->1、不支持多媒体类型上传数据；2、使用方括号包含参数名，如：GET['id']；3、如果为key，必须使用双引号将请括起来如："get": "GET['id']"
+##### 在mockjs的基础上扩展对GET、POST请求参数，以及REST风格参数的支持
+>1、不支持多媒体类型上传数据；2、使用方括号包含参数名，如：@GET['id']；3、如果为key，必须使用双引号将请括起来如："get": "@GET['id']"
 
 ```
 {
-  "get": "GET['id']",
-  "post|3": "POST['user']",
-  "number1|+GET['idstep']": 202,
-  "number2|1-100": 100,
+  "get": "@GET['id']",
+  "post|3": "@POST['user']",
+  "number1|+@GET['idstep']": 202,
+  "number2|1-100": "@REST['number2']",
   "number3|1-100.1-10": 1,
   "number4|123.1-10": 1,
   "number5|123.10": 1.123
+}
+```
+
+mock文件示例1：pageIndex、pageSize分页
+
+```
+{
+  "errorCode":0,
+  "message":"success",
+  "data|@GET['pageSize']":[{
+    "pageIndex":"@GET['pageIndex']",
+    "pageSize":"@GET['pageSize']",
+    "index|+1":1,
+    "id": function(){
+      return (this.pageIndex - 1) * this.pageSize + this.index;
+    },
+    "content":"@cparagraph(2)"
+  }],
+  "total": 83,
+  "pageIndex":"@GET['pageIndex']",
+  "pageSize":"@GET['pageSize']",
+  "totalPageCount": function(){
+    return Math.ceil(this.total / this.pageSize);
+  },
+  "more": function(){
+    return this.totalPageCount - this.pageIndex > 0;
+  }
+}
+```
+?pageIndex=2&pageSize=3 输出
+
+```json
+{
+  errorCode: 0,
+  message: "success",
+  data: [
+    {
+      pageIndex: "2",
+      pageSize: "3",
+      index: 1,
+      content: "始属拉型文们表区外最必比将气或所。办联毛受料但平党马市想群片统技必问。",
+      id: 4
+    },
+    {
+      pageIndex: "2",
+      pageSize: "3",
+      index: 2,
+      content: "年采质性带必安技反书化度或者省专集结。每厂响无局空养更机那精其节。",
+      id: 5
+    },
+    {
+      pageIndex: "2",
+      pageSize: "3",
+      index: 3,
+      content: "三决通商志验空从五质给手己。但间温向准你青交保果决器区已候老酸须。",
+      id: 6
+    }
+  ],
+  total: 83,
+  pageIndex: "2",
+  pageSize: "3",
+  totalPageCount: 28,
+  more: true
+}
+```
+
+
+mock文件示例2：start、length分页
+
+```
+{
+  "errorCode":0,
+  "message":"success",
+  "data|@GET['length']":[{
+    "start":"@GET['start']",
+    "length":"@GET['length']",
+    "index|+1":1,
+    "id": function(){
+      return +this.start - 1 + this.index;
+    },
+    "content":"@cparagraph(2)"
+  }],
+  "total": 83,
+  "start":"@GET['start']",
+  "length":"@GET['length']",
+  "more": function(){
+    return this.total - this.start - this.length > 0;
+  }
+}
+```
+
+/test?start=70&length=5 输出
+
+```json
+{
+  errorCode: 0,
+  message: "success",
+  data: [
+    {
+      start: "71",
+      length: "3",
+      index: 1,
+      content: "任须住形些速社主新变经属国公话做细。指马达省步国信所子体安路已走格。",
+      id: 71
+    },
+    {
+      start: "71",
+      length: "3",
+      index: 2,
+      content: "二即适权世花同想真近月计观精条等。全别毛叫统属维两过完观天些为验队除。",
+      id: 72
+    },
+    {
+      start: "71",
+      length: "3",
+      index: 3,
+      content: "路必些型眼然其工社维克通当意。取斯走全维市作断内极之干因车政。",
+      id: 73
+    }
+  ],
+  total: 83,
+  start: "71",
+  length: "3",
+  more: true
 }
 ```
 
