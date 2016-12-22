@@ -20,6 +20,7 @@
 首先你需要一个接口文档，不管是你提给后端的还是后端发给你的。
 
 如下，获取新闻列表的接口：
+
 | | | |
 |--|--|--|
 |接口名称|获取新闻列表||
@@ -33,7 +34,7 @@
 
 返回：
 
-```json
+```js
 {
   errorCode: 0, // 0 表示正常返回，其它为错误码
   message: "success", //
@@ -60,9 +61,11 @@
 > 这一步，需要点时间，但只操作一次。
 
 1. 安装 http-mock-json-server，需要node环境。
+
    ```shell
    $ npm install -g http-mock-json-server
    ```
+   
 2. 配置 nginx，将 api.example.com 的请求都代理到本地的7071端口，然后重启。
    ```
    server {
