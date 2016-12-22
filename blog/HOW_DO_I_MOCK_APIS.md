@@ -20,9 +20,9 @@
 首先你需要一个接口文档，不管是你提给后端的还是后端发给你的。
 
 如下，获取新闻列表的接口：
-<br/>
+
  |1|2|3| 
- |--|--|--| 
+---|---|---|---|---
  |接口名称|获取新闻列表| | 
  |请求域名| http://api.example.com | | 
  |请求地址|/news/list| | 
@@ -196,17 +196,17 @@ Proxy to 192.168.8.218:80
 #### 第三步 升级为REST风格
 
 1. 接口文档
-<br/>
-| | | |
-|--|--|--|
-|接口名称|获取新闻列表||
-|请求域名|http://api.example.com||
-|请求地址|/news/list/{type}/{pageSize}/{pageIndex}||
-|请求方式|REST||
-|请求参数| ||
-||type|新闻类型|
-||pageSize|每页多少条|
-||pageIndex|页码，从1开始|
+
+ |1|2|3| 
+---|---|---|---|---
+ |接口名称|获取新闻列表| | 
+ |请求域名| http://api.example.com | | 
+ |请求地址|/news/list/{type}/{pageSize}/{pageIndex}| | 
+ |请求方式|REST| | 
+ |请求参数| | | 
+ | |type|新闻类型| 
+ | |pageSize|每页多少条| 
+ | |pageIndex|页码，从1开始| 
 
 2. 修改 mock.json，将 pathname修改为REST风格，其它保持不变。
 
