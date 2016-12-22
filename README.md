@@ -10,6 +10,10 @@
 ### 安装环境 Requirements
 * node 4.1.0+
 
+### 安装 node-canvas
+
+**注意** node-canvas 为可选依赖，安装过程中如果此模块报错不影响使用。如果不安装 node-canvas 则 `@dataImage` 不可用。
+
 #### Mac
 1. 安装 brew
 2. brew install pkg-config cairo libpng jpeg giflib
