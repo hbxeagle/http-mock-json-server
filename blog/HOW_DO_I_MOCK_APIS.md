@@ -1,6 +1,6 @@
 # 模拟 JSON API 的一个方案
 
-> 前后端并行开发（或者说多个业务间并行开发）中，一个比较麻烦的问题，就是如何制造模拟数据和模拟异常状态。此前一直没有找到很好的生成模拟JSON数据**快捷、简单**的方法，直到发现了 **神器 [mockjs](http://mockjs.com/)**。但 [mockjs](http://mockjs.com/) 需要在代码中引入js，而且模拟的代码也要以硬编码的方式写到代码中，不太方便。所以开发了一个命令行工具 [http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)，来完成一些附加功能。
+> 前后端并行开发（或者说多个业务间并行开发）中，一个比较麻烦的问题，就是如何制造模拟数据和模拟异常状态。此前一直没有找到很好的生成模拟JSON数据**快捷、简单**的方法，直到发现了 **神器 [mockjs](http://mockjs.com/)**。但 [mockjs](http://mockjs.com/) 需要在代码中引入js，操作起来不太方便，另一方面无法模拟异常方便的状态。所以开发了一个命令行工具 [http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)，包装了一个node server服务，来完成一些附加功能。
 
 ### 举个栗子🌰
 
