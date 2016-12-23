@@ -362,5 +362,7 @@ http://api.example.com/news/list/1/10/2?jsoncallback=jQuery180023010777333240218
 
 ### 结语
 
-就像最开始说的 [mockjs](http://mockjs.com/) 已经解决了核心问题，[http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)，增加了一些辅助功能，完成了对请求参数和异常状态模拟的支持，让开发者用起来更方便，代价是需要一点nginx的知识。
+就像最开始说的 [mockjs](http://mockjs.com/) 已经解决了制造随机数据的核心问题，[http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)增加了一些辅助功能，完成了对请求参数和异常状态模拟的支持，当然还有不完备的地方。但硬编码的方式写模拟数据的时代应该翻过去了。
+
+by bx 2016.12.23
 
