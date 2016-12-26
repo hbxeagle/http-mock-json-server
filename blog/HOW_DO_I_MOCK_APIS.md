@@ -358,11 +358,11 @@ http://api.example.com/news/list/1/10/2?jsoncallback=jQuery180023010777333240218
 7. 支持jsonp和CORS跨域。
 8. https和socket支持。
 
-以上这些点中，第5点和第8点，cookie 和 session 在这个工具中暂时没有支持。第6点，在对favicon.ico的请求中可以观察到。其它的都能支持。
+以上这些点中，第5点和第8点，cookie 、session 以及 https 和 socket 在这个工具中暂时没有支持。第6点，在对favicon.ico的请求中可以观察到。其它的都能支持。
 
 ### 结语
 
-就像最开始说的 [mockjs](http://mockjs.com/) 已经解决了制造随机数据的核心问题，[http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)增加了一些辅助功能，完成了对请求参数和异常状态模拟的支持，当然还有不完备的地方。但硬编码的方式写模拟数据的时代应该翻过去了。
+就像最开始说的 [mockjs](http://mockjs.com/) 已经解决了制造随机数据的核心问题，[http-mock-json-server](https://www.npmjs.com/package/http-mock-json-server)增加了一些辅助功能，完成了对请求参数和异常状态模拟的支持，当然还有不完备的地方。至少硬编码的方式写模拟数据的时代应该翻过去了。
 
 by bx 2016.12.23
 
