@@ -82,7 +82,8 @@
   }, {
     "pathname":"/rest",
     "apiKey":"method=list",
-    "tpl":"rest.method.list.mock"
+    "tpl":"rest.method.list.mock",
+    "contentType": "application/json;charset=utf-8"
   }]
 }
 ```
@@ -106,6 +107,7 @@ mock：请求路径和模板的匹配关系。
   tpl：mockJSON模板文件
   statusCode：http请求返回码，默认如果模板正常则是200。
   delay：http请求延时
+  contentType: content-type, 如果没有配置此项，优先使用 pathname 后缀对应的content-type，如果 pathname 没有后缀，或找不到后缀对应的 content-type，则默认为'application/json;charset=utf-8'
 ```
 
 ##### test.mock

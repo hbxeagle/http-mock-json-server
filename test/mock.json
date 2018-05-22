@@ -6,7 +6,8 @@
       "pathname":"/test",
       "tpl":"/test.mock",
       "statusCode": 200,
-      "delay": 5000
+      "delay": 5000,
+      "contentType": "text/html;charset=utf-8"
     }, {
       "pathname":"/test/deep/path",
       "tpl":"/test2.mock"

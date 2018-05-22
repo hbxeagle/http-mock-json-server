@@ -37,11 +37,11 @@ const AnalyserRequestPlaceholder = function(mockTpl, reqArg) {
   return mockTpl;
 }
 
-const _mockData = function(tplPath, mock, options, callback) {
+const _mockData = function(tplPath, mockConfig, options, callback) {
 
   let mockTpl = loadMockTpl(tplPath);
 
-  let {GET, POST, REST} = mock;
+  let {GET, POST, REST} = mockConfig;
 
   if(options.log) {
     GET && console.log("GET：",GET);
@@ -58,15 +58,15 @@ const _mockData = function(tplPath, mock, options, callback) {
         let jsoncallback = GET['callback'] || GET['jsoncallback'];
 
         if (jsoncallback) {
-          callback(`${jsoncallback}(${JSON.stringify(data)})`);
+          callback(`${jsoncallback}(${JSON.stringify(data)})`, 200, null, false, mockConfig);
         } else {
-          callback(JSON.stringify(data));
+          callback(JSON.stringify(data), 200, null, false, mockConfig);
         }
     } else {
-      callback(null, 502, new Error('mock tpl not found'));
+      callback(null, 502, new Error('mock tpl not found'), false, mockConfig);
     }
   } catch (e) {
-    callback(null, 502, e);
+    callback(null, 502, e, false, mockConfig);
   }
 }
 
@@ -79,21 +79,21 @@ const mockData = function (request, response, config, options, callback) {
     body = Buffer.concat(body).toString();
 
     let tplPath;
-    let mock = path2mock(request, body, config ? config.mock : []);
+    let mockConfig = path2mock(request, body, config ? config.mock : []);
 
     if (config) {
-      if(mock.tpl) {
-        tplPath = path.join(process.cwd(), mock.tpl);
-        if(mock.delay > 0 && !isNaN(mock.delay)) {
-          sleep(parseInt(mock.delay));
+      if(mockConfig.tpl) {
+        tplPath = path.join(process.cwd(), mockConfig.tpl);
+        if(mockConfig.delay > 0 && !isNaN(mockConfig.delay)) {
+          sleep(parseInt(mockConfig.delay));
         }
-        if(mock.statusCode &&  mock.statusCode!== 200) {
-          callback(null, mock.statusCode);
+        if(mockConfig.statusCode &&  mockConfig.statusCode!== 200) {
+          callback(null, mockConfig.statusCode, null, false, mockConfig);
         }
       }
 
       if (!tplPath && config.ip) {
-        proxyToSourceServer(request, response, config, options, callback);
+        proxyToSourceServer(request, response, config, options, mockConfig, callback);
         return;
       }
 
@@ -101,15 +101,15 @@ const mockData = function (request, response, config, options, callback) {
       tplPath = path.join(process.cwd(), `${pathname}.mock`);
     }
 
-    _mockData(tplPath, mock, options, callback);
+    _mockData(tplPath, mockConfig, options, callback);
   });
 }
 
-const proxyToSourceServer = function (request, response, config, options, callback) {
-  proxyHttp(request, response, config, options, callback);
+const proxyToSourceServer = function (request, response, config, options, mockConfig, callback) {
+  proxyHttp(request, response, config, options, mockConfig, callback);
 }
 
-const proxyHttp = function (request, response, config, options, callback) {
+const proxyHttp = function (request, response, config, options, mockConfig, callback) {
   let opt = {
     host: config.ip,
     port: config.port || "80",
@@ -145,10 +145,10 @@ const proxyHttp = function (request, response, config, options, callback) {
     res.on('data', function (d) {
       resBody += d;
     }).on('end', function () {
-      callback(resBody, res.statusCode, null, true);
+      callback(resBody, res.statusCode, null, true, mockConfig);
     });
   }).on('error', function (e) {
-    callback(null, 502, e);
+    callback(null, 502, e, false, mockConfig);
   });
 
   if (/POST|PUT/i.test(request.method)) {
@@ -158,10 +158,17 @@ const proxyHttp = function (request, response, config, options, callback) {
   }
 }
 
-const output = function (code, data, request, response, pathname) {
+const output = function (code, data, request, response, pathname, mockConfig) {
   if (data) {
+    console.log('-----------', mockConfig);
+    const contentType = mockConfig.contentType 
+      ? mockConfig.contentType
+      : (pathname.match(rType)
+        ? mime.lookup(pathname)
+        : mime.lookup('json')) + ';charset=utf-8';
+
     response.writeHeader(code, {
-      'content-type': (pathname.match(rType) ? mime.lookup(pathname) : mime.lookup('json')) + ';charset=utf-8',
+      'content-type': contentType,
       'Access-Control-Allow-Origin': "*"
     });
     response.end(data);
@@ -183,7 +190,7 @@ const onRequest = function (request, response, options, config) {
 
   console.log(chalk.bold.green('REQ:') + ' http://' + host + pathname);
 
-  mockData(request, response, config, options, function (fileData, statusCode, err, isProxy) {
+  mockData(request, response, config, options, function (fileData, statusCode, err, isProxy, mockConfig) {
     if (isProxy) {
       response.end(fileData);
     }
@@ -194,13 +201,13 @@ const onRequest = function (request, response, options, config) {
       //});
 
       if (fileData) {
-        output(502, null, request, response, pathname);
+        output(502, null, request, response, pathname, mockConfig);
       } else {
-        output(404, null, request, response, pathname);
+        output(404, null, request, response, pathname, mockConfig);
       }
 
     } else {
-      output(statusCode || 200, fileData, request, response, pathname);
+      output(statusCode || 200, fileData, request, response, pathname, mockConfig);
     }
   });
 }
